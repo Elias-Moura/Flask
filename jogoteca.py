@@ -11,6 +11,21 @@ class Jogo:
     def __str__(self):
         return f'{self.nome}'
 
+class Usuario:
+    def __init__(self, nome, nickname, senha):
+        self.nome = nome
+        self.nickname = nickname
+        self.senha = senha
+
+usuario1 = Usuario('Elias Moura', 'Elias', '1234')
+usuario2 = Usuario('Marcelo', 'Botafogo', '5678')
+
+usuarios_dict = {
+    usuario1.nickname: usuario1,
+    usuario2.nickname: usuario2, 
+}
+
+
 
 jogo1 = Jogo('Tetris', 'Puzzle', 'Atari')
 jogo2 = Jogo('GTA V', 'Mundo aberto', 'Xbox 360/PS3')
@@ -52,15 +67,17 @@ def login():
 
 @app.route('/autenticar', methods=['POST',])
 def autenticar():
-    if 'batatinha' == request.form['senha']:
-        session['usuario_logado'] = request.form['usuario']
-        flash(f'{session["usuario_logado"]} logado com sucesso.')
-        if request.form['proxima'] is not None:
-            proxima_pagina = request.form['proxima']
-        else:
-            proxima_pagina = url_for('index')
-
-        return redirect(proxima_pagina)
+    if request.form['usuario'] in usuarios_dict:
+        usuario = usuarios_dict[request.form['usuario']]
+        if request.form['senha'] == usuario.senha:
+            session['usuario_logado'] = usuario.nickname
+            flash(f'{usuario.nickname} logado com sucesso.')
+            if request.form['proxima'] != 'None':
+                proxima_pagina = request.form['proxima']
+            else:
+                proxima_pagina = url_for('index')
+            
+            return redirect(proxima_pagina)
     else:
         flash('Usuário não logado')
         return redirect(url_for('login'))
